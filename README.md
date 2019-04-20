@@ -12,7 +12,7 @@ So next I figured out what commands the chef was running underneath. (It worked 
  * note that galle currently has a bunch of other things installed, including microk8s, postgresql10, docker, and kata-containers (all of which use snap, which complained a bit while installing, so might not actually work)
  * `apt-get install python3-venv apt-mirror rsync wget`
 2. `sudo chown fort:fort /srv`
-3. Install from `requirements.txt`, and run `python mirror.py` _as the fort user_.
+3. Install from `requirements.txt`, and run `python mirror.py` _as the fort user_, with `GITHUB_TOKEN` in the environment.
  * Some things it will create and run under separate venvs, where the mirroring system is driving other python packages.
  * Slightly confusingly this includes gitmirror.py which is here as a helper but depends on `PyGithub` which isn't in `requirements.txt`.
 4. Configure pypi for the fort user to use the local

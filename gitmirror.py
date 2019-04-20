@@ -115,15 +115,16 @@ if __name__ == "__main__":
         'configfile',
         metavar='configfile',
         type=str,
-        nargs='1',
+        nargs=1,
         help='Configuration file location',
     )
     parser.add_argument(
         'apitoken',
         metavar='apitoken',
         type=str,
-        nargs='1',
+        nargs='?',
+        default=os.environ.get('GITHUB_TOKEN'),
         help='Github API token',
     )
-    args.parser.parse_args()
-    mirror(args.configfile, args.apitoken)
+    args = parser.parse_args()
+    mirror(args.configfile[0], args.apitoken)
