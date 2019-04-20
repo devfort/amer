@@ -64,6 +64,7 @@ def mirror(configfile):
                         ]
                     )
 
+    clones = []
     for target, url in clone_actions:
         p = subprocess.Popen(
             [
@@ -75,13 +76,8 @@ def mirror(configfile):
                 target,
             ]
         )
-        p = subprocess.Popen(
-            [
-                'git',
-                'update-server-info',
-            ],
-            cwd=target,
-        )
+        clones.append(p)
+    others = []
     for target, url in update_actions:
         p = subprocess.Popen(
             [
@@ -93,7 +89,22 @@ def mirror(configfile):
             ],
             cwd=target,
         )
+        others.append(p)
 
+    for clone in clones:
+        clone.wait()
+    for target, url in clone_actions:
+        p = subprocess.Popen(
+            [
+                'git',
+                'update-server-info',
+            ],
+            cwd=target,
+        )
+        others.append(p)
+
+    for other in others:
+        other.wait()
 
 if __name__ == "__main__":
     mirror(sys.argv[1])
