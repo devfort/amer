@@ -1,0 +1,35 @@
+############# config ##################
+#
+set base_path    {{ docroot }}
+#
+# set mirror_path  $base_path/mirror
+# set skel_path    $base_path/skel
+# set var_path     $base_path/var
+# set cleanscript $var_path/clean.sh
+{% if architecture %}
+set defaultarch {{ architecture }}
+{% else %}
+# set defaultarch  <running host architecture>
+{% endif %}
+# set postmirror_script $var_path/postmirror.sh
+# set run_postmirror 0
+set nthreads     20
+set _tilde 0
+set _autoclean 1
+set run_postmirror 0
+#
+############# end config ##############
+
+deb {{ remote }} {{ release }} main restricted universe multiverse
+deb {{ remote }} {{ release }}-security main restricted universe multiverse
+deb {{ remote }} {{ release }}-updates main restricted universe multiverse
+deb {{ remote }} {{ release }}-proposed main restricted universe multiverse
+deb {{ remote }} {{ release }}-backports main restricted universe multiverse
+
+deb-src {{ remote }} {{ release }} main restricted universe multiverse
+deb-src {{ remote }} {{ release }}-security main restricted universe multiverse
+deb-src {{ remote }} {{ release }}-updates main restricted universe multiverse
+deb-src {{ remote }} {{ release }}-proposed main restricted universe multiverse
+deb-src {{ remote }} {{ release }}-backports main restricted universe multiverse
+
+clean {{ remote }}

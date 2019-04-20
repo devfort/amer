@@ -1,0 +1,80 @@
+{
+    "command": "Fort mirror configuration",
+    "version": "1.0",
+    "defaults": {
+        "user": "fort",
+        "cwd": "/home/fort",
+        "port": 80,
+        "create-dns-entry": true,
+        "vhost-template": "apache.conf"
+    },
+    "mirrors": [
+        {
+            "id": "pypi-mirror",
+            "params": {
+                "hostname": "pypi.fort",
+                "docroot": "/srv/pypi",
+                "client-uri": "http://pypi.fort/web/simple"
+            },
+            "templates": [
+                "bandersnatch.conf"
+            ],
+            "steps": [
+                "python3 -m venv .bandersnatch.venv",
+                ".bandersnatch.venv/bin/pip install bandersnatch",
+                ".bandersnatch.venv/bin/bandersnatch -c /tmp/mirror-templates/pypi-mirror/bandersnatch.conf mirror"
+            ]
+        },
+        {
+            "id": "apt-mirror",
+            "params": {
+                "hostname": "apt.fort",
+                "docroot": "/srv/apt",
+                "remote": "http://archive.ubuntu.com/ubuntu",
+                "release": "bionic",
+                "architecture": "amd64",
+                "client-uri": "http://apt.fort/"
+            },
+            "templates": [
+                "mirror.list"
+            ],
+            "steps": [
+                "apt-mirror /tmp/mirror-templates/apt-mirror/mirror.list"
+            ]
+        },
+        {
+            "id": "git-mirror",
+            "params": {
+                "hostname": "source.fort",
+                "docroot": "/src/source"
+            },
+            "templates": [
+                "git-mirror.conf"
+            },
+            "steps": [
+                "python3 -m venv .gitmirror.venv",
+                ".gitmirror.venv/bin/pip install PyGithub==1.43.7",
+                ".gitmirror.venv/bin/python3 gitmirror.py /tmp/mirror-templates/git-mirror/gitmirror.conf"
+            ]
+        },
+        {
+            "id": "content-mirror",
+            "params": {
+                "hostname": "content.fort",
+                "docroot": "/srv/content",
+            },
+            "steps": [
+                "rsync ftp.rfc-editor.org::rfcs-text-only /srv/content/RFCs",
+                "rsync ftp.rfc-editor.org::ids-text-only /srv/content/IDs",
+                "wget -N --no-check-certificate -D datasets.imdbws.com,www.imdb.com -r -l 1 https://datasets.imdbws.com/"
+                "FIXME download freebase, geonames, geoip from old files mirror"
+            ]
+        },
+        {
+            "id": "dockerhub-mirror",
+            "steps": [
+                "FIXME docker has a mirroring approach"
+            ]
+        }
+    ]
+}
