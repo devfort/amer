@@ -44,6 +44,11 @@ def mirror(configfile):
                     repo_name,
                 )
                 if not os.path.exists(target_dir):
+                    # First, ensure all parents exist
+                    os.makedirs(
+                        os.path.dirname(target_dir),
+                        exist_ok=True,
+                    )
                     # First time clone!
                     clone_actions.append(
                         [
