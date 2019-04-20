@@ -1,3 +1,4 @@
+import argparse
 from github import Github
 import os.path
 import toml
@@ -8,7 +9,7 @@ import sys
 MIRROR_BASEDIR = '/srv/sources'
 
 
-def mirror(configfile):
+def mirror(configfile, apitoken):
     with open(configfile, 'r') as fp:
         config = toml.load(fp)
 
@@ -18,7 +19,7 @@ def mirror(configfile):
     for host in config.values():
         hostname = host['hostname']
         if hostname == 'github.com':
-            gh = Github(host.get('apitoken'))
+            gh = Github(apitoken)
 
         for repo_owner, repos in host['repos'].items():
             if repos == '*':
@@ -107,4 +108,22 @@ def mirror(configfile):
         other.wait()
 
 if __name__ == "__main__":
-    mirror(sys.argv[1])
+    parser = argparse.ArgumentParser(
+        "Clone lots of git repositories, for fortly purposes.",
+    )
+    parser.add_argument(
+        'configfile',
+        metavar='configfile',
+        type=str,
+        nargs='1',
+        help='Configuration file location',
+    )
+    parser.add_argument(
+        'apitoken',
+        metavar='apitoken',
+        type=str,
+        nargs='1',
+        help='Github API token',
+    )
+    args.parser.parse_args()
+    mirror(args.configfile, args.apitoken)
