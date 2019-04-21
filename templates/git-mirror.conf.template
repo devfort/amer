@@ -42,11 +42,19 @@ hostname = 'github.com'
     'xapian-docsprint',
     'heroku-statsd-example'
   ]
+  webpack = [
+    'webpack',
+    'webpack-cli',
+    'webpack-dev-server'
+  ]
   jquery = [
     'jquery',
     'sizzle',
     'jquery-mobile',
+    'jquery-mousewheel',
+    'jquery-color',
     'jquery-ui',
+    'developer.jquery.org',
     'api.jquery.com',
     'api.jquerymobile.com',
     'api.jqueryui.com'
@@ -72,3 +80,16 @@ hostname = 'github.com'
   historymesh = '*'
   spacelog = '*'
   w3c = '*'
+  diveintomark = [
+    'diveintopython3',
+    'diveintohtml5'
+  ]
+  maxmind = [
+    'libmaxminddb',
+    'MaxMind-DB-Reader-dotnet',
+    'MaxMind-DB-Reader-Java',
+    'MaxMind-DB-Reader-python',
+    'MaxMind-DB-Reader-php',
+    'MaxMind-DB-Reader-perl'
+    'MaxMind-DB-Writer-perl'
+  ]
