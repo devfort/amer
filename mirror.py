@@ -135,18 +135,18 @@ if __name__ == "__main__":
         "Mirror useful parts of the internet, for fortly purposes.",
     )
     parser.add_argument(
-        'kv',
-        metavar='kv',
-        type=str,
-        nargs='*',
-        help='Key-value pairs to add to defaults',
-    )
-    parser.add_argument(
         'configfile',
         metavar='configfile',
         type=str,
         nargs=1,
         help='Config file for mirroring',
+    )
+    parser.add_argument(
+        'kv',
+        metavar='kv',
+        type=str,
+        nargs='*',
+        help='Key-value pairs to add to defaults',
     )
     args = parser.parse_args()
     defaults = dict(
@@ -156,10 +156,10 @@ if __name__ == "__main__":
         )
     )
 
-    with open(args.configfile, 'r') as cin:
+    with open(args.configfile[0], 'r') as cin:
         config = json.load(cin)
     config['defaults'].update(defaults)
-    mirrors = Mirror.from_config(config)
+    mirrors = list(Mirror.from_config(config))
 
     with Pool(len(mirrors)) as p:
         p.map(do_mirror, mirrors)
