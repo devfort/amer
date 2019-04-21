@@ -50,7 +50,7 @@
             },
             "templates": [
                 "git-mirror.conf"
-            },
+            ],
             "steps": [
                 "python3 -m venv .gitmirror.venv",
                 ".gitmirror.venv/bin/pip install PyGithub==1.43.7",
