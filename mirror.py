@@ -53,13 +53,13 @@ class Mirror:
             with open(
                 self.rendered_template_filename(self.params['vhost-template']),
                 'r'
-            ) as in, open(
+            ) as inf, open(
                 os.path.join(
                     '/etc/apache2/sites-available',
                     '%s.conf' % self.identifier,
                 )
-            ) as out:
-                in.write(out.read())
+            ) as outf:
+                inf.write(outf.read())
             subprocess.call(
                 "a2ensite %s" % self.identifier
             )
