@@ -24,3 +24,5 @@ So next I figured out what commands the chef was running underneath. (It worked 
 * consider blacklists or whitelists for bandersnatch to reduce what we pull
 * configure bandersnatch to reduce historical versions?
 * nicer output from both mirror.py and gitmirror.py; the former at least uses logfiles (this would also enable us to control the parallelism in git mirroring, using a pool rather than just all the subprocesses -- although that might end up running slower)
+* could track which clones have completed in gitmirror, and update their server info as they complete (this is probably easiest done by moving to a parallel pool, as in mirror.py)
+* for git clones where master isn't the default branch, figure that out and fetch the right branch instead
