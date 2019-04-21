@@ -138,10 +138,17 @@ if __name__ == "__main__":
         'kv',
         metavar='kv',
         type=str,
-        nargs='+',
+        nargs='*',
         help='Key-value pairs to add to defaults',
     )
-    args.parser.parse_args()
+    parser.add_argument(
+        'configfile',
+        metavar='configfile',
+        type=str,
+        nargs=1,
+        help='Config file for mirroring',
+    )
+    args = parser.parse_args()
     defaults = dict(
         (
             kv.split('=', 1)
@@ -149,7 +156,7 @@ if __name__ == "__main__":
         )
     )
 
-    with open(configfile, 'r') as cin:
+    with open(args.configfile, 'r') as cin:
         config = json.load(cin)
     config['defaults'].update(defaults)
     mirrors = Mirror.from_config(config)
