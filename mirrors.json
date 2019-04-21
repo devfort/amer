@@ -67,7 +67,7 @@
             "steps": [
                 "rsync --recursive ftp.rfc-editor.org::rfcs-text-only /srv/content/RFCs",
                 "rsync --recursive ftp.rfc-editor.org::ids-text-only /srv/content/IDs",
-                "wget -N --no-check-certificate -D datasets.imdbws.com,www.imdb.com -r -l 1 https://datasets.imdbws.com/",
+                "wget -N --no-check-certificate -H -D datasets.imdbws.com,www.imdb.com -r -l 1 https://datasets.imdbws.com/",
                 "wget -N --no-check-certificate https://dumps.wikimedia.org/enwiki/20190401/enwiki-20190401-pages-meta-current.xml.bz2",
                 "wget -N --no-check-certificate http://download.geonames.org/export/dump/allCountries.zip",
                 "wget -N --no-check-certificate http://download.geonames.org/export/dump/cities1000.zip",
