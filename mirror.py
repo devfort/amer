@@ -1,5 +1,5 @@
 import argparse
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 import json
 from multiprocessing import Pool
 import os
@@ -38,33 +38,34 @@ class Mirror:
             self.params["vhost-template"]
         )
         self.env = Environment(
-            loader=PackageLoader('devfort_mirror', 'templates'),
+            loader=FileSystemLoader('./templates'),
             autoescape=False,
         )
         self.template_dir = os.path.join(
             MIRROR_TEMPLATES_TMPDIR,
             self.identifier,
         )
+        os.makedirs(self.template_dir, exist_ok=True)
 
-    def mirror(self):
+    def mirror(self, configure_apache=False):
         try:
             self.render_templates()
-            # copy in apache2 vhost config and enable that site
-            with open(
-                self.rendered_template_filename(self.params['vhost-template']),
-                'r'
-            ) as inf, open(
-                os.path.join(
-                    '/etc/apache2/sites-available',
-                    '%s.conf' % self.identifier,
-                )
-            ) as outf:
-                inf.write(outf.read())
-            subprocess.call(
-                "a2ensite %s" % self.identifier
-            )
-
-            # FIXME: add DNS entry
+            if configure_apache:
+                # copy in apache2 vhost config and enable that site
+                with open(
+                    self.rendered_template_filename(self.params['vhost-template']),
+                    'r'
+                ) as inf, open(
+                    os.path.join(
+                        '/etc/apache2/sites-available',
+                        '%s.conf' % self.identifier,
+                    )
+                ) as outf:
+                    inf.write(outf.read())
+                    subprocess.call(
+                        "a2ensite %s" % self.identifier
+                    )
+                # FIXME: add DNS entry
 
             # need to su before we do the mirroring, because we want
             # that run as another user
@@ -94,7 +95,7 @@ class Mirror:
     def render_templates(self):
         for t in self.templates:
             self.render_template(
-                "%.template" % t,
+                "%s.template" % t,
                 self.rendered_template_filename(t),
             )
 
@@ -111,7 +112,7 @@ class Mirror:
                 mirror['id'],
                 mirror['steps'],
                 mirror.get('templates'),
-                mirror['params'],
+                **mirror['params'],
             )
 
 
@@ -120,19 +121,42 @@ def do_mirror(mirror):
     # So it's safe to throw away stdout and stderr and never
     # restore them.
     sys.stdout = open(
-        os.path.join(LOGDIR, "%.out" % mirror.identifier),
+        os.path.join(LOGDIR, "%s.out" % mirror.identifier),
         'w',
     )
     sys.stderr = open(
-        os.path.join(LOGDIR, "%.err" % mirror.identifier),
+        os.path.join(LOGDIR, "%s.err" % mirror.identifier),
         'w',
     )
-    return m.mirror()
+    return mirror.mirror()
+
+
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         "Mirror useful parts of the internet, for fortly purposes.",
+    )
+    parser.add_argument(
+        '--serial',
+        dest='serial',
+        default=False,
+        action='store_true',
+        help='run in serial rather than parallel',
+    )
+    parser.add_argument(
+        '--logdir',
+        dest='logdir',
+        default=LOGDIR,
+        action='store',
+        help='set logging directory',
+    )
+    parser.add_argument(
+        '--tmpdir',
+        dest='tmpdir',
+        default=MIRROR_TEMPLATES_TMPDIR,
+        action='store',
+        help='set temp directory',
     )
     parser.add_argument(
         'configfile',
@@ -156,10 +180,20 @@ if __name__ == "__main__":
         )
     )
 
+    LOGDIR = args.logdir
+    MIRROR_TEMPLATES_TMPDIR = args.tmpdir
+
     with open(args.configfile[0], 'r') as cin:
         config = json.load(cin)
     config['defaults'].update(defaults)
     mirrors = list(Mirror.from_config(config))
 
-    with Pool(len(mirrors)) as p:
-        p.map(do_mirror, mirrors)
+    if args.serial:
+        for mirror in mirrors:
+            do_mirror(mirror)
+    else:
+        # FIXME: doesn't work because jinja2 isn't pickleable,
+        # because pickling is a bad idea but apparently we still
+        # use it. Sigh.
+        with Pool(len(mirrors)) as p:
+            p.map(do_mirror, mirrors)
